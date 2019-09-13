@@ -1,0 +1,32 @@
+embeddings:
+   - toy_embedding:
+      location: ./toy_embedding.csv
+      placeholder_emb_param: placeholder_value1
+   - placeholder_embedding_name:
+      location: some_location
+      placeholder_emb_param: placeholder_value2
+
+tests:
+   - placeholder_test1:
+      test_routine: placeholder_predefined_test1
+      placeholder_test_param1: placeholder_value2
+      placeholder_test_param2: placeholder_list1
+
+   # It should be permissible for two tests to run the same 
+   # underlying routine but with different values. For example, a
+   # parameter for the UMLS test might be a cutoff distance.
+   # We may wish to run the same test on multiple cutoff distances.
+   - placeholder_test2:
+      test_routine: placeholder_predefined_test1
+      placeholder_test_param1: placeholder_value3 
+      placeholder_test_param2: placeholder_list1
+
+   - placeholder_test3:
+      test_type: placeholder_predefined_test2
+      exclude: placeholder_embedding_name
+
+output:
+   format: placeholder_format
+   location: some_location
+   placeholder_output_param: placeholder_param
+
