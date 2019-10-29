@@ -8,7 +8,7 @@ from collections import OrderedDict
 from collections import Counter
 from gensim.models import KeyedVectors
 
-logging.basicConfig(format='%(asctime)s %(process)d %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.CRITICAL)
+logging.basicConfig(format='%(asctime)s %(process)d %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.INFO)
 
 
 class DBCheck(object):
@@ -139,6 +139,8 @@ if '__main__' == __name__:
     look = UMLSLookup()
 
     semantics = []
+    f = open("Output.txt", "w+")
+
     for word in list(model.vocab):
         semantics_word = look.get_semantics_for_word(word)
         if len(semantics_word) == 0:
@@ -147,7 +149,9 @@ if '__main__' == __name__:
 
     for key, value in Counter(semantics).items():
         logging.info("{} :: {}".format(key, value))
+        f.write("{} :: {}".format(key, value))
 
+    f.close()
     # final_dict = Counter(semantics_for_allergy + semantics_for_fever)
     # print(list(final_dict.keys()))
     # print(list(final_dict.values()))
