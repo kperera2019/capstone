@@ -141,11 +141,14 @@ if '__main__' == __name__:
     semantics = []
     f = open("Output.txt", "w+")
 
-    for word in list(model.vocab):
-        semantics_word = look.get_semantics_for_word(word)
+    counter = 0
+    listofvocab = list(model.vocab)
+    while(counter < int(word_count)):
+        semantics_word = look.get_semantics_for_word(listofvocab[counter])
         if len(semantics_word) == 0:
             semantics_word.append("Out-of-UMLS")
         semantics += semantics_word
+        counter += 1
 
     for key, value in Counter(semantics).items():
         logging.info("{} :: {}".format(key, value))
