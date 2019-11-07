@@ -150,10 +150,12 @@ if '__main__' == __name__:
         semantics += semantics_word
         counter += 1
 
-    for key, value in Counter(semantics).items():
+    umls_semantics_dict = Counter(semantics).items()
+    counts = [xx[1] for xx in list(umls_semantics_dict)]
+    sum = sum(counts)
+    for key, value in umls_semantics_dict:
         logging.info("{} :: {}".format(key, value))
-        f.write("{} :: {}".format(key, value))
-
+        f.write("{} :: {} {}%\n".format(key, value, round(int(value) / sum * 100, 2)))
     f.close()
     # final_dict = Counter(semantics_for_allergy + semantics_for_fever)
     # print(list(final_dict.keys()))
