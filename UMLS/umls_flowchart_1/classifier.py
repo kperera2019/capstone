@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 import matplotlib.pyplot as plt
-import configparser
+
 from sqlite import SQLite
 from collections import OrderedDict
 from collections import Counter
@@ -46,14 +46,14 @@ class UMLSLookup(object):
             self.did_check_dbs = True
 
         if preferred:
-            sql = 'SELECT STY FROM descriptions WHERE STR LIKE ? AND SAB IN ({})'.format(
+            sql = 'SELECT STY FROM descriptions WHERE STR IS ? COLLATE NOCASE AND SAB IN ({})'.format(
                 ", ".join(UMLSLookup.preferred_sources))
         else:
-            sql = 'SELECT STY FROM descriptions WHERE STR LIKE ?'
+            sql = 'SELECT STY FROM descriptions WHERE STR IS ? COLLATE NOCASE'
 
         # return as list
         arr = []
-        for res in self.sqlite.execute(sql, ('%' + word + '%',)):
+        for res in self.sqlite.execute(sql, (word,)):
             arr += (res[0].split('|'))
 
         arr = list(OrderedDict.fromkeys(arr))
@@ -84,7 +84,7 @@ class UMLSLookup(object):
             self.semantics_dict = self.get_semantics()
 
         logging.info("Fetching semantics for word: {}".format(word))
-        semantics_id_list_for_word = self.lookup_word(word)
+        semantics_id_list_for_word = self.lookup_word(word, False)
         logging.debug("Semantics ID:\n{}".format(semantics_id_list_for_word))
 
         word_semantics = []
@@ -116,23 +116,12 @@ class EmbeddingReader(object):
 
 if '__main__' == __name__:
 
-    config = configparser.ConfigParser()
-    config.read('D:\capstone local\example.ini')
+    if len(sys.argv) != 4:
+        raise Exception("Please provide valid parameter as <Path of word embedding TSV> <Vocab length> <Dimension of vectors for words>")
 
-for section_name in config.sections():
-    print('Section:', section_name)
-    print(' Options:', config.options(section_name))
-    for name, value in config.items(section_name):
-        print(' {} = {}'.format(name,value))
-    print()
-
-    inputsone = config.items('TestOne')[2][1]
-    inputstwo = config.items('TestOne')[3][1]
-    inputsthree = config.items('TestOne')[4][1]
-
-    tsv_file = inputsone
-    word_count = inputstwo
-    vector_dimension = inputsthree
+    tsv_file = sys.argv[1]
+    word_count = sys.argv[2]
+    vector_dimension = sys.argv[3]
 
     # if not tsv_file:
     #     raise Exception("Please provide path of the TSV word embedding file")
