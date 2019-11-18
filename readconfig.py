@@ -17,10 +17,5 @@ for section_name in config.sections():
 inputsone = config.items('TestOne')[2][1]
 inputstwo = config.items('TestOne')[3][1]
 inputsthree = config.items('TestOne')[4][1]
-print(inputstwo)
 
-filetorun = r'D:\capstone local\UMLS\umls_flowchart_1\classifier.py'
 
-print(os.path.exists(filetorun))
-
-os.system('powershell.exe python {}'.format(filetorun))
