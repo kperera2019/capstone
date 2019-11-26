@@ -205,7 +205,23 @@ DIAGNOSES_ICD, NOTEEVENTS = preprocess.load_data()
 DIAGNOSES_ICD_freq = preprocess.diag_icd(DIAGNOSES_ICD)
 df2 = preprocess.noteevents(NOTEEVENTS)
 NOTE_DIAGNOSES, train_X, val_X, test_X, train_y, val_y, test_y, tokenizer = preprocess.join_data(df2, DIAGNOSES_ICD_freq)
-embedding_matrix = process.embedding('wemb_sample.tsv', tokenizer)
+
+config = configparser.ConfigParser()
+config.read('D:\capstone\example.ini')
+
+if(section_name == 'TestTwo'):
+	print('Section:', section_name)
+	print(' Options:', config.options(section_name))
+	for name, value in config.items(section_name):
+		print(' {} = {}'.format(name,value))
+	print()
+
+inputsone = config.items('TestTwo')[2][1]
+
+
+tsv_file = inputsone
+
+embedding_matrix = process.embedding(tsv_file, tokenizer)
 model_glove = process.model(embedding_matrix)
 
 
