@@ -7,7 +7,7 @@ import subprocess
 Config = configparser.ConfigParser()
 Config['TestOne'] = {'TestVariety': 'UMLS', 'Test': 'Synonym','InputType': 'D:/capstone local/UMLS/umls_flowchart_1/wemb_sample.tsv','WordLength': '20','VectorLength':'100'}
 
-Config['TestTwo'] = {'TestVariety':'MIMIC', 'Test':'NeuralNetwork', 'InputOne':'D:/capstone/UMLS/umls_flowchart_1/wemb_sample.tsv'}
+Config['TestTwo'] = {'TestVariety':'MIMIC', 'Test':'NeuralNetwork', 'InputOne':'D:/capstone/UMLS/umls_flowchart_1/wemb_sample.tsv','InputTwo':'DIAGNOSES_ICD.csv','InputThree':'NOTEEVENTS.csv'}
 
 Config['TestThree'] = {'TestVariety':'UMLS','Test':'Semantics', 'InputType':'D:/capstone local/UMLS/umls_flowchart_1/wemb_sample.tsv'}
 
