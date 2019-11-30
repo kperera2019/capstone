@@ -18,7 +18,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.pipeline import Pipeline
 from sklearn import model_selection
 from keras import backend as K
-
+import configparser
 
 # In[2]:
 
@@ -71,24 +71,36 @@ import keras
 
 print(os.getcwd())  
 #os.chdir(r'C:\Users\lsahi\Documents\Lakamana_GMU_Sem3\DAEN690\mimic-iii-clinical-database-1.4')
-os.chdir(r'C:\Users\lsahi\Documents\Lakamana_GMU_Sem3\DAEN690\mimic-iii-clinical-database-1.4')
+#s.chdir(r'C:\Users\lsahi\Documents\Lakamana_GMU_Sem3\DAEN690\mimic-iii-clinical-database-1.4')
 
 
 # In[5]:
+config = configparser.ConfigParser()
+config.read('D:\capstone\example.ini')
+print('Section:', 'TestTwo')
+print(' Options:', config.options('TestTwo'))
+for name, value in config.items('TestTwo'):
+	print(' {} = {}'.format(name,value))
+print()
 
+inputsone = config.items('TestTwo')[2][1]
+inputstwo = config.items('TestTwo')[3][1]
+inputsthree = config.items('TestTwo')[4][1]
 
 class preprocess():
     
     def load_data():
-        NOTEEVENTS=pd.read_csv('NOTEEVENTS.csv',dtype={'ROW_ID':np.int32, 'SUBJECT_ID': np.int32,'HADM_ID': np.float64, 
+        print(inputsthree)
+        NOTEEVENTS=pd.read_csv('D:/capstone/mimic/INPUTS/NOTEEVENTS.csv',dtype={'ROW_ID':np.int32, 'SUBJECT_ID': np.int32,'HADM_ID': np.float64, 
                                                        'CHARTDATE':str,'STORETIME':str,'CHARTTIME':str,   
                                                        'STORETIME': str,'CATEGORY': str,'DESCRIPTION':str,'CGID':str,'ISERROR':str,
                                                        'TEXT':str}, parse_dates=['CHARTDATE'])
-        DIAGNOSES_ICD=pd.read_csv('DIAGNOSES_ICD.csv',dtype={'ROW_ID':np.int32, 'SUBJECT_ID': np.int32,'HADM_ID': np.int32,
+        DIAGNOSES_ICD=pd.read_csv('D:/capstone/mimic/INPUTS/DIAGNOSES_ICD.csv',dtype={'ROW_ID':np.int32, 'SUBJECT_ID': np.int32,'HADM_ID': np.int32,
                                                              'SEQ_NUM':  np.float64,'ICD9_CODE':str})
         DIAGNOSES_ICD['ICD9_CODE']=DIAGNOSES_ICD['ICD9_CODE'].str.pad(4,'left','0')
         DIAGNOSES_ICD['ICD9_CHAP']=DIAGNOSES_ICD['ICD9_CODE'].str.slice(0,3)
         DIAGNOSES_ICD=DIAGNOSES_ICD[~DIAGNOSES_ICD['ICD9_CODE'].str.slice(0,1).isin(['V','E','U','8','9'])]
+        print(DIAGNOSES_ICD)
         return DIAGNOSES_ICD, NOTEEVENTS
     
     def diag_icd(DIAGNOSES_ICD):
@@ -200,23 +212,13 @@ class process():
 
 # In[9]:
 
-if(section_name == 'TestTwo'):
-	print('Section:', section_name)
-	print(' Options:', config.options(section_name))
-	for name, value in config.items(section_name):
-		print(' {} = {}'.format(name,value))
-	print()
-
-inputsone = config.items('TestTwo')[2][1]
-inputstwo = config.items('TestTwo')[3][1]
-inputsthree = config.items('TestTwo')[4][1]
 inputstwo, inputsthree = preprocess.load_data() 
+print("DATA PREPROCESSED")
 DIAGNOSES_ICD_freq = preprocess.diag_icd(inputstwo)
 df2 = preprocess.noteevents(inputsthree)
 NOTE_DIAGNOSES, train_X, val_X, test_X, train_y, val_y, test_y, tokenizer = preprocess.join_data(df2, DIAGNOSES_ICD_freq)
 
-config = configparser.ConfigParser()
-config.read('D:\capstone\example.ini')
+
 
 
 
@@ -226,7 +228,7 @@ tsv_file = inputsone
 embedding_matrix = process.embedding(tsv_file, tokenizer)
 model_glove = process.model(embedding_matrix)
 
-
+print(model_glove)
 # In[ ]:
 
 
