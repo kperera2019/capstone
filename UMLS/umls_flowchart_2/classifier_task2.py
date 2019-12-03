@@ -1,7 +1,7 @@
 import logging
 import os
 import sys
-
+import configparser
 from sqlite import SQLite
 from collections import OrderedDict
 from collections import Counter
@@ -161,13 +161,23 @@ class EmbeddingReader(object):
 
 if '__main__' == __name__:
 
-    if len(sys.argv) != 4:
-        raise Exception("Please provide valid parameter as <Path of word embedding TSV> <Vocab length> <Dimension of vectors for words>")
+    config = configparser.ConfigParser()
+    config.read('D:\capstone\example.ini')
 
-    tsv_file = sys.argv[1]
-    word_count = sys.argv[2]
-    vector_dimension = sys.argv[3]
+    if(section_name == 'TestThree'):
+        print('Section:', section_name)
+        print(' Options:', config.options(section_name))
+        for name, value in config.items(section_name):
+            print(' {} = {}'.format(name,value))
+        print()
 
+    inputsone = config.items('TestOne')[2][1]
+    inputstwo = config.items('TestOne')[3][1]
+    inputsthree = config.items('TestOne')[4][1]
+
+    tsv_file = inputsone
+    word_count = inputstwo
+    vector_dimension = inputsthree
     # if not tsv_file:
     #     raise Exception("Please provide path of the TSV word embedding file")
 
