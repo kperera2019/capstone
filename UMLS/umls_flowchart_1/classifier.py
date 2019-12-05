@@ -45,6 +45,8 @@ class UMLSLookup(object):
             DBCheck.check_database()
             self.did_check_dbs = True
 
+        logging.info("Fetching semantics for word: {}".format(word))
+
         if preferred:
             sql = 'SELECT STY FROM descriptions WHERE STR IS ? COLLATE NOCASE AND SAB IN ({})'.format(
                 ", ".join(UMLSLookup.preferred_sources))
@@ -59,39 +61,40 @@ class UMLSLookup(object):
         arr = list(OrderedDict.fromkeys(arr))
         return arr
 
-    def get_semantics(self):
-        if not self.did_check_dbs:
-            DBCheck.check_database()
-            self.did_check_dbs = True
-
-        sql = 'SELECT DISTINCT TUI, STY FROM MRSTY'
-
-        sem_dict = {}
-        for res in self.sqlite.execute(sql):
-            sem_dict[res[0]] = res[1]
-        return sem_dict
-
-    def get_semantics_for_word(self, word):
-        if word is None or len(word) < 1:
-            return []
-
-        if not self.did_check_dbs:
-            DBCheck.check_database()
-            self.did_check_dbs = True
-
-        if len(self.semantics_dict) == 0:
-            logging.info("Loading semantics from UMLS DB")
-            self.semantics_dict = self.get_semantics()
-
-        logging.info("Fetching semantics for word: {}".format(word))
-        semantics_id_list_for_word = self.lookup_word(word, False)
-        logging.debug("Semantics ID:\n{}".format(semantics_id_list_for_word))
-
-        word_semantics = []
-        for tui in semantics_id_list_for_word:
-            word_semantics.append(self.semantics_dict[tui])
-
-        return word_semantics
+    # def get_semantics(self):
+    #     if not self.did_check_dbs:
+    #         DBCheck.check_database()
+    #         self.did_check_dbs = True
+    #
+    # #     sql = 'SELECT DISTINCT TUI, STY FROM MRSTY'
+    # #
+    # #     sem_dict = {}
+    # #     for res in self.sqlite.execute(sql):
+    # #         sem_dict[res[0]] = res[1]
+    # #     return sem_dict
+    # #
+    # def get_semantics_for_word(self, word):
+    #     if word is None or len(word) < 1:
+    #         return []
+    #
+    #     if not self.did_check_dbs:
+    #         DBCheck.check_database()
+    #         self.did_check_dbs = True
+    #
+    #     if len(self.semantics_dict) == 0:
+    #         logging.info("Loading semantics from UMLS DB")
+    #         self.semantics_dict = self.get_semantics()
+    #
+    #     logging.info("Fetching semantics for word: {}".format(word))
+    #     semantics_id_list_for_word = self.lookup_word(word, False)
+    #     logging.debug("Semantics ID:\n{}".format(semantics_id_list_for_word))
+    #
+    #     word_semantics = []
+    #     for tui in semantics_id_list_for_word:
+    #         word_semantics.append(self.semantics_dict[tui])
+    #
+    #     return word_semantics
+    #
 
 
 class EmbeddingReader(object):
@@ -154,8 +157,8 @@ if '__main__' == __name__:
 
     counter = 0
     listofvocab = list(model.vocab)
-    while(counter < int(word_count)):
-        semantics_word = look.get_semantics_for_word(listofvocab[counter])
+    while (counter < int(word_count)):
+        semantics_word = look.lookup_word(listofvocab[counter], preferred=False)
         if len(semantics_word) == 0:
             semantics_word.append("Out-of-UMLS")
         semantics += semantics_word
