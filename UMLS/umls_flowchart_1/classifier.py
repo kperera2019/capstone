@@ -22,7 +22,7 @@ class DBCheck(object):
         If missing prompt to use the `umlsdbload` script
         """
 
-        umls_db = os.path.join('databases', 'umls.db')
+        umls_db = os.path.join('../../databases', 'umls.db')
         if not os.path.exists(umls_db):
             raise Exception("The UMLS database at {} does not exist. Run the import script `umlsdbloadscript`.".format(os.path.abspath(umls_db)))
 
@@ -35,7 +35,7 @@ class UMLSLookup(object):
 
     def __init__(self):
         absoulte = os.path.dirname(os.path.realpath(__file__))
-        self.sqlite = SQLite.get(os.path.join(absoulte, "databases/umls.db"))
+        self.sqlite = SQLite.get("../../databases/umls.db")
 
     def lookup_word(self, word, preferred=True):
         if word is None or len(word) < 1:

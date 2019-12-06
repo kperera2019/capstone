@@ -1,7 +1,7 @@
 import logging
 import os
 import sys
-
+import configparser
 from sqlite import SQLite
 from collections import OrderedDict
 from collections import Counter
@@ -127,7 +127,6 @@ class EmbeddingReader(object):
 
 if '__main__' == __name__:
 
-<<<<<<< HEAD:UMLS/umls_flowchart_2/classifier_task2.py
     config = configparser.ConfigParser()
     config.read('D:\capstone\example.ini')
     print('Section:', 'TestThree')
@@ -144,14 +143,6 @@ if '__main__' == __name__:
     vector_dimension = inputsthree
     # if not tsv_file:
     #     raise Exception("Please provide path of the TSV word embedding file")
-=======
-    if len(sys.argv) != 4:
-        raise Exception("Please provide valid parameter as <Path of word embedding TSV> <Vocab length> <Dimension of vectors for words>")
-
-    tsv_file = sys.argv[1]
-    word_count = sys.argv[2]
-    vector_dimension = sys.argv[3]
->>>>>>> 22f79f0a85095c0a579b6a05b53fa0b9f746aef3:UMLS/umls_flowchart_2/vicinity_analysis.py
 
     if not os.path.exists(tsv_file):
         raise Exception("Please provide valid path of the TSV word embedding file")
