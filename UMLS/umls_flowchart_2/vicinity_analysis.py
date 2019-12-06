@@ -1,11 +1,13 @@
 import logging
 import os
 import sys
-import configparser
+
 from sqlite import SQLite
 from collections import OrderedDict
 from collections import Counter
 from gensim.models import KeyedVectors
+import pandas as pd
+import openpyxl
 
 logging.basicConfig(format='%(asctime)s %(process)d %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
 
@@ -53,6 +55,7 @@ class UMLSLookup(object):
         semantics_for_word = []
         synonyms_for_word = []
         worde = []
+        # Separates 2 lists, one for semantics and one for synonyms
         for res in self.sqlite.execute(sql, (word,)):
             semantics_for_word += ([x for x in res[0].split('|')])
             synonyms_for_word.append(res[1])
@@ -65,42 +68,12 @@ class UMLSLookup(object):
 
         logging.debug("semantics for word {} are {}".format(word, semantics_for_word))
         logging.debug("synonyms for word {} are {}".format(word, synonyms_for_word))
+
+        # Grouping synonyms by semantics
         semantics_and_synonyms = []
         for semantic in semantics_for_word:
             semantics_and_synonyms.append((semantic, "||".join(synonyms_for_word)))
-        print("smantics Length: " + str(len(semantics_and_synonyms)) + " Word Length: " + str(len(worde)))
         return semantics_and_synonyms, worde
-
-    # def get_semantics(self):
-    #     if not self.did_check_dbs:
-    #         DBCheck.check_database()
-    #         self.did_check_dbs = True
-    #
-    #     sql = 'SELECT DISTINCT TUI, STY FROM MRSTY'
-    #
-    #     sem_dict = {}
-    #     for res in self.sqlite.execute(sql):
-    #         sem_dict[res[0]] = res[1]
-    #     return sem_dict
-
-    # def get_semantics_for_word(self, word):
-    #     if word is None or len(word) < 1:
-    #         return []
-    #
-    #     if not self.did_check_dbs:
-    #         DBCheck.check_database()
-    #         self.did_check_dbs = True
-    #
-    #     logging.info("Fetching semantics for word: {}".format(word))
-    #     semantics_id_list_for_word = self.lookup_word(word, False)
-    #     logging.debug("Semantics ID:\n{}".format(semantics_id_list_for_word))
-    #
-    #     word_semantics = []
-    #     for tui in semantics_id_list_for_word:
-    #         word_semantics.append(self.semantics_dict[tui])
-    #
-    #     return word_semantics
-
 
 class EmbeddingReader(object):
     model = None
@@ -127,40 +100,34 @@ class EmbeddingReader(object):
 
     def get_cosine_similar_words(self, word_list, word_emb):
         similar_word_list = []
-        print(len(word_list), len(word_emb))
-        # for word in word_list[0]:
-        #     for worde in word_emb[0]:
-        #         try:
-        #             # similar_word_list += self.model.most_similar(positive=[word, worde])
-        #             similar_word_list = self.model.similarity(word, worde)
-        #             print("synonyms: " + word + " , word: " + worde + " , similarity: " + str(similar_word_list))
-        #         except:
-        #             similar_word_list = "Not Available in vocabulary"
-        #             print("synonyms: " + word + " , word: " + worde + " , similarity: " + str(similar_word_list))
-        #             # pass
+        count = 0 # Number of words for which cosine similarity can be found
+        similarity = 0 # Cosine similarity for each word
+        total_similarity = 0 # Cosine similarity for each semantic
+        no_count = 0
         try:
             for n in range(len(word_list)):
-                # print(word_list[n])
                 try:
-                    # similar_word_list += self.model.most_similar(positive=[word, worde])
                     similar_word_list = self.model.similarity(word_list[n], word_emb[n])
+                    total_similarity = total_similarity + similar_word_list
+                    count = count + 1
+
                     print("synonyms: " + word_list[n] + " , word: " + word_emb[n] + " , similarity: " + str(
                         similar_word_list))
                 except:
-                    similar_word_list = "Not Available in vocabulary"
+                    similar_word_list1 = "Not Available in vocabulary"
+                    no_count = no_count + 1
                     print("synonyms: " + word_list[n] + " , word: " + word_emb[n] + " , similarity: " + str(
-                        similar_word_list))
-                    # pass
+                        similar_word_list1))
+            similarity = total_similarity
         except:
             pass
 
-        # while word in word_list and worde
-        print(similar_word_list)
-        return similar_word_list
+        return similarity, count, no_count
 
 
 if '__main__' == __name__:
 
+<<<<<<< HEAD:UMLS/umls_flowchart_2/classifier_task2.py
     config = configparser.ConfigParser()
     config.read('D:\capstone\example.ini')
     print('Section:', 'TestThree')
@@ -177,6 +144,14 @@ if '__main__' == __name__:
     vector_dimension = inputsthree
     # if not tsv_file:
     #     raise Exception("Please provide path of the TSV word embedding file")
+=======
+    if len(sys.argv) != 4:
+        raise Exception("Please provide valid parameter as <Path of word embedding TSV> <Vocab length> <Dimension of vectors for words>")
+
+    tsv_file = sys.argv[1]
+    word_count = sys.argv[2]
+    vector_dimension = sys.argv[3]
+>>>>>>> 22f79f0a85095c0a579b6a05b53fa0b9f746aef3:UMLS/umls_flowchart_2/vicinity_analysis.py
 
     if not os.path.exists(tsv_file):
         raise Exception("Please provide valid path of the TSV word embedding file")
@@ -189,24 +164,43 @@ if '__main__' == __name__:
     look = UMLSLookup()
 
     semantics = []
-    f = open("Output.txt", "w+")
-
+    repeat = 0 # To avoid words that already been seen as synonym
     counter = 0
     list_of_words = embeddingReader.get_word_list()
     while counter < int(word_count):
-        semantics_synonyms_word, word_emb = look.lookup_word(list_of_words[counter], False)
-        for record in semantics_synonyms_word:
-            similar_words = embeddingReader.get_cosine_similar_words(record[1].split("||"), word_emb)
-            logging.debug("{} for word {}".format(similar_words, record[1]))
-            semantics.append((record[0], similar_words))
-        counter += 1
+        # For the first word there will be no words in "semantics" list to compare the words with
+        if len(semantics) == 0:
+            semantics_synonyms_word, word_emb = look.lookup_word(list_of_words[counter], False)
+            for record in semantics_synonyms_word:
+                similar_words, words_present, words_not_present = embeddingReader.get_cosine_similar_words(record[1].split("||"), word_emb)
+                logging.debug("{} for word {}".format(similar_words, record[1]))
+                semantics.append((record[0], words_present + words_not_present, words_present, similar_words))
+            counter += 1
+        # If any word has alredy seen as synonym then, declare j = 1
+        else:
+            for term in semantics:
+                if list_of_words[counter] == term:
+                    repeat = 1
 
-    print(semantics)
-    print(type(semantics))
-    # umls_semantics_dict = Counter(semantics).items()
-    # counts = [xx[1] for xx in list(umls_semantics_dict)]
-    # sum = sum(counts)
-    # for key, value in umls_semantics_dict:
-    #     logging.info("{} :: {}".format(key, value))
-    #     f.write("{} :: {} {}%\n".format(key, value, round(int(value) / sum * 100, 2)))
-    # f.close()
+        if repeat == 1:
+            logging.debug("Synonyms for word {} has been already stated".format(record[1]))
+            counter += 1
+        else:
+            semantics_synonyms_word, word_emb = look.lookup_word(list_of_words[counter], False)
+            for record in semantics_synonyms_word:
+                similar_words, words_present, words_not_present = embeddingReader.get_cosine_similar_words(
+                    record[1].split("||"), word_emb)
+                logging.debug("{} for word {}".format(similar_words, record[1]))
+                semantics.append((record[0], words_present + words_not_present, words_present, similar_words))
+            counter += 1
+
+
+    semantics_df = pd.DataFrame(semantics, columns=['semantics', 'total', 'present', 'avg'])
+    semantics_grp = semantics_df.groupby(['semantics']).agg({'total': 'sum', 'present': 'sum', 'avg': 'sum'})
+    semantics_grp = semantics_grp.reset_index()
+    semantics_grp['avg'] = semantics_grp['avg'] / semantics_grp['present']
+    #Final Output
+    print(semantics_grp)
+    # Output saved as excel
+    semantics_grp.to_excel(r'output.xlsx')
+
