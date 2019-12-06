@@ -21,7 +21,7 @@ class DBCheck(object):
         If missing prompt to use the `umlsdbload` script
         """
 
-        umls_db = os.path.join('databases', 'umls.db')
+        umls_db = os.path.join('../../databases', 'umls.db')
         if not os.path.exists(umls_db):
             raise Exception("The UMLS database at {} does not exist. Run the import script `umlsdbloadscript`.".format(os.path.abspath(umls_db)))
 
@@ -34,7 +34,7 @@ class UMLSLookup(object):
 
     def __init__(self):
         absolute = os.path.dirname(os.path.realpath(__file__))
-        self.sqlite = SQLite.get(os.path.join(absolute, "databases/umls.db"))
+        self.sqlite = SQLite.get("../../databases/umls.db")
 
     def lookup_word(self, word, preferred=True):
         if word is None or len(word) < 1:
@@ -163,17 +163,14 @@ if '__main__' == __name__:
 
     config = configparser.ConfigParser()
     config.read('D:\capstone\example.ini')
-
-    if(section_name == 'TestThree'):
-        print('Section:', section_name)
-        print(' Options:', config.options(section_name))
-        for name, value in config.items(section_name):
-            print(' {} = {}'.format(name,value))
-        print()
-
-    inputsone = config.items('TestOne')[2][1]
-    inputstwo = config.items('TestOne')[3][1]
-    inputsthree = config.items('TestOne')[4][1]
+    print('Section:', 'TestThree')
+    print(' Options:', config.options('TestThree'))
+    for name, value in config.items('TestThree'):
+        print(' {} = {}'.format(name,value))
+    print()
+    inputsone = config.items('TestThree')[2][1]
+    inputstwo = config.items('TestThree')[3][1]
+    inputsthree = config.items('TestThree')[4][1]
 
     tsv_file = inputsone
     word_count = inputstwo

@@ -118,13 +118,11 @@ if '__main__' == __name__:
 
     config = configparser.ConfigParser()
     config.read('D:\capstone\example.ini')
-
-    if(section_name == 'TestOne'):
-        print('Section:', section_name)
-        print(' Options:', config.options(section_name))
-        for name, value in config.items(section_name):
-            print(' {} = {}'.format(name,value))
-        print()
+    print('Section:', 'TestOne')
+    print(' Options:', config.options('TestOne'))
+    for name, value in config.items('TestOne'):
+        print(' {} = {}'.format(name,value))
+    print()
 
     inputsone = config.items('TestOne')[2][1]
     inputstwo = config.items('TestOne')[3][1]
